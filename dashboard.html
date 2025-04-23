@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fraud Detection Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 30px; background: #f2f2f2; }
+    h1 { color: #333; }
+    #result { margin-top: 20px; font-size: 1.2em; }
+    .label { font-weight: bold; }
+    button { padding: 10px 15px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Fraud Detection Dashboard</h1>
+  <div>
+    <button onclick="simulateTransaction()">Simulate Transaction</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    async function simulateTransaction() {
+      const sampleTransaction = {
+        "Amount": Math.random() * 1000,
+        "Transaction_Hour": Math.floor(Math.random() * 24),
+        "Risk_Score": Math.random(),  // Simulated
+        "Previous_Fraud_Flag": Math.random() > 0.5 ? 1 : 0,
+        "Merchant_Type": "Grocery",
+        "User_Location": "Delhi"
+      };
+
+      const response = await fetch("http://127.0.0.1:8000/predict_fraud", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(sampleTransaction)
+      });
+
+      const result = await response.json();
+      const probability = result.fraud_probability;
+      const isFraud = probability > 0.5;
+
+      document.getElementById("result").innerHTML = `
+        <p><span class="label">Fraud Probability:</span> ${probability.toFixed(4)}</p>
+        <p><span class="label">Is Fraud?</span> ${isFraud ? 'Yes 🔴' : 'No 🟢'}</p>
+      `;
+    }
+  </script>
+</body>
+</html>
